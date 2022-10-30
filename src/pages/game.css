@@ -1,0 +1,39 @@
+.gameContainer {
+  margin-top: 10vh;
+}
+
+.score {
+ font-size: 36px;
+ font-weight: 900;
+ text-align: center;
+ margin-bottom: 10vh;
+ color: #303030;
+}
+
+.answerButton {
+  background-color: #459e4b;
+  color: white;
+  font-weight: 900;
+  font-size: 36px;
+  width: 90%;
+  margin: 0 auto;
+  height: 60vh;
+  border-radius: 20px;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.isAnswering {
+  background-color: #357ecf;
+}
+
+.blockedButton {
+  background-color: #767676;
+}
+
+.falseStart {
+  background-color: #c43a3a;
+}

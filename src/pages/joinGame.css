@@ -1,0 +1,15 @@
+.joinGameContainer {
+  margin: 30vh 20px;
+}
+
+.nameInput {
+  margin-bottom: 20px;
+}
+
+.codeInput {
+  margin-bottom: 20px;
+}
+
+.joinButton {
+  width: 100%;
+}
