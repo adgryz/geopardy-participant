@@ -2,8 +2,12 @@ import { useState, useEffect, ReactNode, createContext } from "react";
 import { useNavigate } from "react-router-dom";
 import io from "socket.io-client";
 
+import { getUseSocket } from "./useSocket";
+
 const socket = io("https://geopargygame.herokuapp.com/");
 // const socket = io("http://localhost:3003");
+
+const useSocket = getUseSocket(socket);
 
 const CONNECT = "connect";
 const DISCONNECT = "disconnect";
@@ -50,110 +54,44 @@ export const SocketProvider = ({ children }: ISocketProviderProps) => {
   const [gameId, setGameId] = useState<string | null>(null);
   const [score, setScore] = useState(0);
   const [isOpenForAnswer, setIsOpenForAnswer] = useState(false);
-  const [messagesLog, setMessagesLog] = useState<string[]>([]);
-  const addNewMessage = (message: string) =>
-    setMessagesLog((messagesLog) => [...messagesLog, message]);
 
-  useEffect(() => {
-    socket.on(CONNECT, () => {
-      addNewMessage(CONNECT);
-      setIsConnected(true);
-    });
-    socket.on(DISCONNECT, () => {
-      addNewMessage(DISCONNECT);
-      setIsConnected(false);
-    });
-
-    return () => {
-      socket.off(CONNECT);
-      socket.off(DISCONNECT);
-    };
-  }, []);
-
-  useEffect(() => {
-    socket.on(RETURN_JOIN_GAME, (isSuccess: boolean) => {
-      addNewMessage(RETURN_JOIN_GAME);
-      setIsGameJoined(isSuccess);
-    });
-    return () => {
-      socket.off(RETURN_JOIN_GAME);
-    };
+  useSocket(CONNECT, () => setIsConnected(true));
+  useSocket(CONNECT, () => setIsConnected(false));
+  useSocket(RETURN_JOIN_GAME, (isSuccess: boolean) => {
+    setIsGameJoined(isSuccess);
   });
 
-  useEffect(() => {
-    socket.on(RETURN_START_GAME, () => {
-      addNewMessage(RETURN_START_GAME);
-      navigate("/game");
-    });
-    return () => {
-      socket.off(RETURN_START_GAME);
-    };
+  useSocket(RETURN_START_GAME, () => {
+    navigate("/game");
   });
 
-  useEffect(() => {
-    socket.on(SEND_ANSWER_QUESTION, () => {
-      addNewMessage(SEND_ANSWER_QUESTION);
-      navigate("/game");
-    });
-    return () => {
-      socket.off(SEND_ANSWER_QUESTION);
-    };
+  useSocket(SEND_ANSWER_QUESTION, () => {
+    navigate("/game");
+  }); // do we need it?
+
+  useSocket(RETURN_NEW_PLAYER_SCORE, (score) => {
+    setScore(score);
+    setIsOpenForAnswer(false);
   });
 
-  useEffect(() => {
-    socket.on(RETURN_NEW_PLAYER_SCORE, (score) => {
-      addNewMessage(RETURN_NEW_PLAYER_SCORE);
-      setScore(score);
-      setIsOpenForAnswer(false);
-    });
-    return () => {
-      socket.off(RETURN_NEW_PLAYER_SCORE);
-    };
+  useSocket(RETURN_START_QUESTION, () => {
+    setIsOpenForAnswer(true);
   });
 
-  useEffect(() => {
-    socket.on(RETURN_START_QUESTION, () => {
-      addNewMessage(RETURN_START_QUESTION);
-      setIsOpenForAnswer(true);
-    });
-    return () => {
-      socket.off(RETURN_START_QUESTION);
-    };
+  useSocket(RETURN_ANSWER_QUESTION_BLOCKED, () => {
+    setIsOpenForAnswer(false);
   });
 
-  useEffect(() => {
-    socket.on(RETURN_ANSWER_QUESTION_BLOCKED, () => {
-      addNewMessage(RETURN_ANSWER_QUESTION_BLOCKED);
-      setIsOpenForAnswer(false);
-    });
-    return () => {
-      socket.off(RETURN_ANSWER_QUESTION_BLOCKED);
-    };
+  useSocket(RETURN_ANSWER_QUESTION_OPEN, () => {
+    setIsOpenForAnswer(true);
   });
 
-  useEffect(() => {
-    socket.on(RETURN_ANSWER_QUESTION_OPEN, () => {
-      addNewMessage(RETURN_ANSWER_QUESTION_OPEN);
-      setIsOpenForAnswer(true);
-    });
-    return () => {
-      socket.off(RETURN_ANSWER_QUESTION_OPEN);
-    };
+  useSocket(RETURN_PLAYER_ANSWERED_WRONGLY, () => {
+    setIsOpenForAnswer(false);
   });
 
-  useEffect(() => {
-    socket.on(RETURN_PLAYER_ANSWERED_WRONGLY, () => {
-      addNewMessage(RETURN_PLAYER_ANSWERED_WRONGLY);
-      setIsOpenForAnswer(false);
-    });
-    socket.on(RETURN_PLAYER_CAN_ANSWER, () => {
-      addNewMessage(RETURN_PLAYER_CAN_ANSWER);
-      setIsOpenForAnswer(true);
-    });
-    return () => {
-      socket.off(RETURN_PLAYER_ANSWERED_WRONGLY);
-      socket.off(RETURN_PLAYER_CAN_ANSWER);
-    };
+  useSocket(RETURN_PLAYER_CAN_ANSWER, () => {
+    setIsOpenForAnswer(true);
   });
 
   const sendJoinGame = (gameId: string, playerName: string) => {
