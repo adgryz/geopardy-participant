@@ -1,11 +1,11 @@
-import { useState, useEffect, ReactNode, createContext } from "react";
+import { useState, ReactNode, createContext } from "react";
 import { useNavigate } from "react-router-dom";
 import io from "socket.io-client";
 
 import { getUseSocket } from "./useSocket";
 
-const socket = io("https://geopargygame.herokuapp.com/");
-// const socket = io("http://localhost:3003");
+// const socket = io("https://geopargygame.herokuapp.com/");
+const socket = io("http://localhost:3003");
 
 const useSocket = getUseSocket(socket);
 
@@ -56,7 +56,7 @@ export const SocketProvider = ({ children }: ISocketProviderProps) => {
   const [isOpenForAnswer, setIsOpenForAnswer] = useState(false);
 
   useSocket(CONNECT, () => setIsConnected(true));
-  useSocket(CONNECT, () => setIsConnected(false));
+  useSocket(DISCONNECT, () => setIsConnected(false));
   useSocket(RETURN_JOIN_GAME, (isSuccess: boolean) => {
     setIsGameJoined(isSuccess);
   });
