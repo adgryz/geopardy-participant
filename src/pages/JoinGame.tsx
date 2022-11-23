@@ -8,25 +8,28 @@ import "./game.css";
 import "./joinGame.css";
 
 export const JoinGame = () => {
-  const { sendJoinGame, isConnected, isGameJoined } = useContext(AppContext);
-  const [gameId, setGameId] = useState<string>("");
+  const { sendJoinTournament, isConnected, isTournamentJoined } =
+    useContext(AppContext);
+  const [tournamentId, setTournamentId] = useState<string>("Test");
   const [name, setName] = useState<string>("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isGameJoined) {
+    if (isTournamentJoined) {
       navigate("/lobby");
     }
-  }, [isGameJoined, navigate]);
+  }, [isTournamentJoined, navigate]);
 
   const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setName(event.currentTarget.value);
   };
-  const handleGameIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setGameId(event.currentTarget.value);
+  const handleTournamentIdChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setTournamentId(event.currentTarget.value);
   };
-  const handleJoinGame = () => {
-    sendJoinGame(gameId, name);
+  const handleJoinTournament = () => {
+    sendJoinTournament(tournamentId, name);
   };
 
   return (
@@ -39,22 +42,24 @@ export const JoinGame = () => {
         onChange={handleNameChange}
       />
       <Input
-        placeholder="Podaj kod gry"
+        placeholder="Podaj kod turnieju"
         className="codeInput"
-        value={gameId}
+        value={tournamentId}
         disabled={!name}
-        onChange={handleGameIdChange}
+        onChange={handleTournamentIdChange}
       />
       <Button
         colorScheme="teal"
-        disabled={!name || !gameId}
+        disabled={!name || !tournamentId}
         size="lg"
         className="joinButton"
-        onClick={handleJoinGame}
+        onClick={handleJoinTournament}
       >
-        Dołącz do gry
+        Dołącz do turnieju
       </Button>
-      {isGameJoined === false && <div>Nie udało się połączyć z serwerem</div>}
+      {isTournamentJoined === false && (
+        <div>Nie udało się połączyć z serwerem</div>
+      )}
     </div>
   );
 };

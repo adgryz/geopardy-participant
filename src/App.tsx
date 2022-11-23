@@ -17,6 +17,12 @@ function App() {
             <Route path="/" element={<JoinGame />} />
             <Route path="/lobby" element={<WaitingForGameStart />} />
             <Route path="/game" element={<Game />} />
+            <Route path="/gameWinner" element={<div>Wygrałeś grę</div>} />
+            <Route path="/loser" element={<div>Sorry, odpadasz</div>} />
+            <Route
+              path="/tournamentWinner"
+              element={<div>Wygrałeś, udało Ci się pokonąć wszystkich :)</div>}
+            />
           </Routes>
         </ChakraProvider>
       </SocketProvider>

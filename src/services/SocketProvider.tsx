@@ -1,22 +1,27 @@
-import { useState, ReactNode, createContext } from "react";
+import { useState, ReactNode, createContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import io from "socket.io-client";
 
 import { getUseSocket } from "./useSocket";
 
 // const socket = io("https://geopargygame.herokuapp.com/");
-const socket = io("http://localhost:3003");
+const socket = io("http://localhost:3123");
 
 const useSocket = getUseSocket(socket);
 
 const CONNECT = "connect";
 const DISCONNECT = "disconnect";
 
-const SEND_JOIN_GAME = "sendJoinGame";
-const SEND_ANSWER_QUESTION = "sendAnswerQuestion";
+const SEND_JOINT_TOURNAMENT = "sendJoinTournament";
+const RETURN_JOIN_TOURNAMENT = "returnJoinTournament";
+const RETURN_START_TOURNAMENT = "returnStartTournament";
 
-const RETURN_JOIN_GAME = "returnJoinGame";
 const RETURN_START_GAME = "returnStartGame";
+const RETURN_LOST_GAME = "returnLostGame";
+const RETURN_WON_GAME = "returnWonGame";
+const RETURN_FINAL_GAME_START = "returnFinalGameStart";
+
+const SEND_ANSWER_QUESTION = "sendAnswerQuestion";
 const RETURN_NEW_PLAYER_SCORE = "returnNewPlayerScore";
 const RETURN_START_QUESTION = "returnStartQuestion";
 const RETURN_ANSWER_QUESTION_BLOCKED = "returnAnswerQuestionBlocked";
@@ -30,8 +35,12 @@ interface ISocketProviderProps {
 
 interface AppData {
   isConnected: boolean;
-  isGameJoined?: boolean;
-  sendJoinGame: (gameId: string, playerName: string) => void;
+  isTournamentJoined?: boolean;
+  isTournamentStarted: boolean;
+  sendJoinTournament: (gameId: string, playerName: string) => void;
+
+  isGameWinner?: boolean;
+  isTournamentWinner?: boolean;
 
   score: number;
   isOpenForAnswer: boolean;
@@ -40,8 +49,8 @@ interface AppData {
 
 export const AppContext = createContext<AppData>({
   isConnected: false,
-  sendJoinGame: () => {},
-
+  sendJoinTournament: () => {},
+  isTournamentStarted: false,
   score: 0,
   isOpenForAnswer: false,
   sendAnswerQuestion: () => {},
@@ -50,65 +59,92 @@ export const AppContext = createContext<AppData>({
 export const SocketProvider = ({ children }: ISocketProviderProps) => {
   const navigate = useNavigate();
   const [isConnected, setIsConnected] = useState(socket.connected);
-  const [isGameJoined, setIsGameJoined] = useState<boolean | undefined>();
+  const [isTournamentJoined, setIsTournamentJoined] =
+    useState<boolean | undefined>();
+  const [isTournamentStarted, setIsTournamentStarted] = useState(false);
+  const [tournamentId, setTournamentId] = useState<string | null>(null);
+  const [isTournamentWinner, setIsTournamentWinner] =
+    useState<boolean | undefined>();
+
+  const [isPlayingFinalGame, setIsPlayingFinalGame] =
+    useState<boolean | undefined>();
+
   const [gameId, setGameId] = useState<string | null>(null);
+  const [isGameWinner, setIsGameWinner] = useState<boolean | undefined>();
+
   const [score, setScore] = useState(0);
   const [isOpenForAnswer, setIsOpenForAnswer] = useState(false);
 
+  useEffect(() => {
+    isGameWinner ? navigate("/gameWinner") : navigate("/loser");
+  }, [isGameWinner, navigate]);
+
+  useEffect(() => {
+    if (isPlayingFinalGame) {
+      navigate("/game");
+    }
+  }, [isPlayingFinalGame, navigate]);
+
   useSocket(CONNECT, () => setIsConnected(true));
   useSocket(DISCONNECT, () => setIsConnected(false));
-  useSocket(RETURN_JOIN_GAME, (isSuccess: boolean) => {
-    setIsGameJoined(isSuccess);
+  useSocket(RETURN_JOIN_TOURNAMENT, (isSuccess: boolean) => {
+    setIsTournamentJoined(isSuccess);
   });
 
-  useSocket(RETURN_START_GAME, () => {
+  useSocket(RETURN_START_TOURNAMENT, () => setIsTournamentStarted(true));
+
+  useSocket(RETURN_START_GAME, ({ gameId }: { gameId: string }) => {
+    setGameId(gameId);
     navigate("/game");
   });
 
-  useSocket(SEND_ANSWER_QUESTION, () => {
-    navigate("/game");
-  }); // do we need it?
-
-  useSocket(RETURN_NEW_PLAYER_SCORE, (score) => {
-    setScore(score);
+  useSocket(RETURN_NEW_PLAYER_SCORE, ({ newScore }) => {
+    setScore(newScore);
     setIsOpenForAnswer(false);
   });
-
   useSocket(RETURN_START_QUESTION, () => {
     setIsOpenForAnswer(true);
   });
-
   useSocket(RETURN_ANSWER_QUESTION_BLOCKED, () => {
     setIsOpenForAnswer(false);
   });
-
   useSocket(RETURN_ANSWER_QUESTION_OPEN, () => {
     setIsOpenForAnswer(true);
   });
-
   useSocket(RETURN_PLAYER_ANSWERED_WRONGLY, () => {
     setIsOpenForAnswer(false);
   });
-
   useSocket(RETURN_PLAYER_CAN_ANSWER, () => {
     setIsOpenForAnswer(true);
   });
+  useSocket(RETURN_WON_GAME, () => {
+    setIsGameWinner(true);
+  });
+  useSocket(RETURN_LOST_GAME, () => {
+    setIsGameWinner(false);
+  });
 
-  const sendJoinGame = (gameId: string, playerName: string) => {
-    socket.emit(SEND_JOIN_GAME, { gameId, playerName });
-    setGameId(gameId);
+  useSocket(RETURN_FINAL_GAME_START, () => {
+    setIsPlayingFinalGame(true);
+  });
+
+  const sendJoinTournament = (tournamentId: string, playerName: string) => {
+    socket.emit(SEND_JOINT_TOURNAMENT, { tournamentId, playerName });
+    setTournamentId(tournamentId);
   };
 
   const sendAnswerQuestion = () => {
-    socket.emit(SEND_ANSWER_QUESTION);
+    console.log(SEND_ANSWER_QUESTION, { tournamentId, gameId });
+    socket.emit(SEND_ANSWER_QUESTION, { tournamentId, gameId });
   };
 
   return (
     <AppContext.Provider
       value={{
         isConnected,
-        isGameJoined,
-        sendJoinGame,
+        isTournamentJoined,
+        isTournamentStarted,
+        sendJoinTournament,
 
         score,
         isOpenForAnswer,

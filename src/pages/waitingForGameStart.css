@@ -14,8 +14,12 @@
   align-items: center;
 }
 
+.waitingUpperText {
+  text-align: center;
+}
+
 .loader {
-  margin: 20px;
+  margin: 50px 20px;
   position: relative;
   width: 100px;
   height: 16px;
