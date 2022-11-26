@@ -17,7 +17,10 @@ function App() {
             <Route path="/" element={<JoinGame />} />
             <Route path="/lobby" element={<WaitingForGameStart />} />
             <Route path="/game" element={<Game />} />
-            <Route path="/gameWinner" element={<div>Wygrałeś grę</div>} />
+            <Route
+              path="/gameWinner"
+              element={<div>Wygrałeś grę. Czekaj na grę finałową.</div>}
+            />
             <Route path="/loser" element={<div>Sorry, odpadasz</div>} />
             <Route
               path="/tournamentWinner"

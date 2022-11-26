@@ -12,15 +12,21 @@ const useSocket = getUseSocket(socket);
 const CONNECT = "connect";
 const DISCONNECT = "disconnect";
 
+//tournament
 const SEND_JOINT_TOURNAMENT = "sendJoinTournament";
 const RETURN_JOIN_TOURNAMENT = "returnJoinTournament";
 const RETURN_START_TOURNAMENT = "returnStartTournament";
 
+//games
 const RETURN_START_GAME = "returnStartGame";
 const RETURN_LOST_GAME = "returnLostGame";
 const RETURN_WON_GAME = "returnWonGame";
 const RETURN_FINAL_GAME_START = "returnFinalGameStart";
 
+//final_game
+const RETURN_START_FINAL_GAME = "returnStartFinalGame";
+
+//questions
 const SEND_ANSWER_QUESTION = "sendAnswerQuestion";
 const RETURN_NEW_PLAYER_SCORE = "returnNewPlayerScore";
 const RETURN_START_QUESTION = "returnStartQuestion";
@@ -76,11 +82,17 @@ export const SocketProvider = ({ children }: ISocketProviderProps) => {
   const [isOpenForAnswer, setIsOpenForAnswer] = useState(false);
 
   useEffect(() => {
-    isGameWinner ? navigate("/gameWinner") : navigate("/loser");
-  }, [isGameWinner, navigate]);
+    if (isGameWinner === true && !isPlayingFinalGame) {
+      navigate("/gameWinner");
+    }
+    if (isGameWinner === false && !isPlayingFinalGame) {
+      navigate("/loser");
+    }
+  }, [isGameWinner, navigate, isPlayingFinalGame]);
 
   useEffect(() => {
     if (isPlayingFinalGame) {
+      setScore(0);
       navigate("/game");
     }
   }, [isPlayingFinalGame, navigate]);
@@ -96,6 +108,11 @@ export const SocketProvider = ({ children }: ISocketProviderProps) => {
   useSocket(RETURN_START_GAME, ({ gameId }: { gameId: string }) => {
     setGameId(gameId);
     navigate("/game");
+  });
+
+  useSocket(RETURN_START_FINAL_GAME, ({ gameId }: { gameId: string }) => {
+    setGameId(gameId);
+    setIsPlayingFinalGame(true);
   });
 
   useSocket(RETURN_NEW_PLAYER_SCORE, ({ newScore }) => {
@@ -122,10 +139,6 @@ export const SocketProvider = ({ children }: ISocketProviderProps) => {
   });
   useSocket(RETURN_LOST_GAME, () => {
     setIsGameWinner(false);
-  });
-
-  useSocket(RETURN_FINAL_GAME_START, () => {
-    setIsPlayingFinalGame(true);
   });
 
   const sendJoinTournament = (tournamentId: string, playerName: string) => {
