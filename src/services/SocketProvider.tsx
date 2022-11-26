@@ -21,10 +21,10 @@ const RETURN_START_TOURNAMENT = "returnStartTournament";
 const RETURN_START_GAME = "returnStartGame";
 const RETURN_LOST_GAME = "returnLostGame";
 const RETURN_WON_GAME = "returnWonGame";
-const RETURN_FINAL_GAME_START = "returnFinalGameStart";
 
 //final_game
 const RETURN_START_FINAL_GAME = "returnStartFinalGame";
+const RETURN_WON_FINAL_GAME = "returnWonFinalGame";
 
 //questions
 const SEND_ANSWER_QUESTION = "sendAnswerQuestion";
@@ -91,6 +91,19 @@ export const SocketProvider = ({ children }: ISocketProviderProps) => {
   }, [isGameWinner, navigate, isPlayingFinalGame]);
 
   useEffect(() => {
+    if (isTournamentWinner) {
+      navigate("/isTournamentWinner");
+    }
+  }, [isTournamentWinner, navigate]);
+
+  useEffect(() => {
+    if (isPlayingFinalGame) {
+      setScore(0);
+      navigate("/game");
+    }
+  }, [isPlayingFinalGame, navigate]);
+
+  useEffect(() => {
     if (isPlayingFinalGame) {
       setScore(0);
       navigate("/game");
@@ -139,6 +152,9 @@ export const SocketProvider = ({ children }: ISocketProviderProps) => {
   });
   useSocket(RETURN_LOST_GAME, () => {
     setIsGameWinner(false);
+  });
+  useSocket(RETURN_WON_FINAL_GAME, () => {
+    setIsTournamentWinner(true);
   });
 
   const sendJoinTournament = (tournamentId: string, playerName: string) => {

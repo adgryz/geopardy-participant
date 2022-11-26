@@ -1,0 +1,14 @@
+.gameWinnerContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 32px;
+  font-weight: bold;
+  flex-direction: column;
+  height: 100vh;
+  text-align: center;
+}
+
+.gameWinnerText {
+ margin-bottom: 20px;
+}

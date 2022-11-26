@@ -7,6 +7,9 @@ import { SocketProvider } from "./services/SocketProvider";
 import { JoinGame } from "./pages/JoinGame";
 import { WaitingForGameStart } from "./pages/WaitingForGameStart";
 import { Game } from "./pages/Game";
+import { GameWinner } from "./pages/resultPages/GameWinner";
+import { Loser } from "./pages/resultPages/Loser";
+import { TournamentWinner } from "./pages/resultPages/TournamentWinner";
 
 function App() {
   return (
@@ -17,15 +20,9 @@ function App() {
             <Route path="/" element={<JoinGame />} />
             <Route path="/lobby" element={<WaitingForGameStart />} />
             <Route path="/game" element={<Game />} />
-            <Route
-              path="/gameWinner"
-              element={<div>Wygrałeś grę. Czekaj na grę finałową.</div>}
-            />
-            <Route path="/loser" element={<div>Sorry, odpadasz</div>} />
-            <Route
-              path="/tournamentWinner"
-              element={<div>Wygrałeś, udało Ci się pokonąć wszystkich :)</div>}
-            />
+            <Route path="/gameWinner" element={<GameWinner />} />
+            <Route path="/loser" element={<Loser />} />
+            <Route path="/tournamentWinner" element={<TournamentWinner />} />
           </Routes>
         </ChakraProvider>
       </SocketProvider>

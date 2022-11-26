@@ -1,0 +1,14 @@
+.tournamentWinnerContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 32px;
+  font-weight: bold;
+  flex-direction: column;
+  height: 100vh;
+  text-align: center;
+}
+
+.tournamentWinnerText {
+  margin-bottom: 20px;
+ }
