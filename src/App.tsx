@@ -10,6 +10,7 @@ import { Game } from "./pages/Game";
 import { GameWinner } from "./pages/resultPages/GameWinner";
 import { Loser } from "./pages/resultPages/Loser";
 import { TournamentWinner } from "./pages/resultPages/TournamentWinner";
+import { FinalQuestion } from "./pages/FinalQuestion";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
             <Route path="/" element={<JoinGame />} />
             <Route path="/lobby" element={<WaitingForGameStart />} />
             <Route path="/game" element={<Game />} />
+            <Route path="/finalQuestion" element={<FinalQuestion />} />
             <Route path="/gameWinner" element={<GameWinner />} />
             <Route path="/loser" element={<Loser />} />
             <Route path="/tournamentWinner" element={<TournamentWinner />} />

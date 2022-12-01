@@ -3,7 +3,7 @@ import "./loser.css";
 export const Loser = () => {
   return (
     <div className="loserContainer">
-      <div className="loserText">Niestety przegyrwasz :/</div>
+      <div className="loserText">Niestety przegyrwasz</div>
       <img
         alt="pikapikasad"
         className="loserGif"

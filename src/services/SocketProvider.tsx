@@ -35,6 +35,15 @@ const RETURN_ANSWER_QUESTION_OPEN = "returnAnswerQuestionOpen";
 const RETURN_PLAYER_ANSWERED_WRONGLY = "returnPlayerAnsweredWrongly";
 const RETURN_PLAYER_CAN_ANSWER = "returnPlayerCanAnswer";
 
+//finalQuestion
+const RETURN_START_FINAL_QUESTION = "returnStartFinalQuestion";
+const SEND_BET_AMOUNT = "sendBetAmount";
+const RETURN_FINAL_QUESTION = "returnFinalQuestion";
+const SEND_FINAL_QUESTION_ANSWER = "sendFinalQuestionAnswer";
+const RETURN_RUN_OUT_OF_TIME = "returnRunOutOfTime";
+const RETURN_IS_FINAL_QUESTION_ANSWER_CORRECT =
+  "returnIsFinalQuestionAnswerCorrect";
+
 interface ISocketProviderProps {
   children: ReactNode;
 }
@@ -51,6 +60,13 @@ interface AppData {
   score: number;
   isOpenForAnswer: boolean;
   sendAnswerQuestion: () => void;
+
+  isBetting: boolean;
+  isAnsweringFinalQuestion: boolean;
+  sendBetAmount: (betAmount: number) => void;
+  sendFinalQuestionAnswer: (answer: string) => void;
+  runOutOfTime: boolean;
+  isFinalQuestionAnswerCorrect?: boolean;
 }
 
 export const AppContext = createContext<AppData>({
@@ -60,6 +76,11 @@ export const AppContext = createContext<AppData>({
   score: 0,
   isOpenForAnswer: false,
   sendAnswerQuestion: () => {},
+  isBetting: false,
+  isAnsweringFinalQuestion: false,
+  runOutOfTime: false,
+  sendBetAmount: () => {},
+  sendFinalQuestionAnswer: () => {},
 });
 
 export const SocketProvider = ({ children }: ISocketProviderProps) => {
@@ -81,35 +102,59 @@ export const SocketProvider = ({ children }: ISocketProviderProps) => {
   const [score, setScore] = useState(0);
   const [isOpenForAnswer, setIsOpenForAnswer] = useState(false);
 
+  const [isFinalQuestion, setIsFinalQuestion] = useState(false);
+  const [isBetting, setIsBetting] = useState(false);
+  const [runOutOfTime, setRunOutOfTime] = useState(false);
+  const [isAnsweringFinalQuestion, setIsAnsweringFinalQuestion] =
+    useState(false);
+  const [isFinalQuestionAnswerCorrect, setIsFinalQuestionAnswerCorrect] =
+    useState<boolean | undefined>();
+
   useEffect(() => {
-    if (isGameWinner === true && !isPlayingFinalGame) {
+    console.log(
+      isGameWinner,
+      isPlayingFinalGame,
+      "resultNavigation",
+      isGameWinner === true && !isPlayingFinalGame
+    );
+    if (isGameWinner === true) {
+      console.log("navigate gameWinner");
       navigate("/gameWinner");
     }
-    if (isGameWinner === false && !isPlayingFinalGame) {
+    if (isGameWinner === false) {
       navigate("/loser");
     }
-  }, [isGameWinner, navigate, isPlayingFinalGame]);
+  }, [isGameWinner]);
 
   useEffect(() => {
     if (isTournamentWinner) {
-      navigate("/isTournamentWinner");
+      navigate("/tournamentWinner");
     }
-  }, [isTournamentWinner, navigate]);
+  }, [isTournamentWinner]);
+
+  useEffect(() => {
+    if (isPlayingFinalGame) {
+      setScore(0);
+      setIsFinalQuestion(false);
+      setRunOutOfTime(false);
+      setIsFinalQuestionAnswerCorrect(undefined);
+      setIsBetting(false);
+      navigate("/game");
+    }
+  }, [isPlayingFinalGame]);
 
   useEffect(() => {
     if (isPlayingFinalGame) {
       setScore(0);
       navigate("/game");
     }
-  }, [isPlayingFinalGame, navigate]);
+  }, [isPlayingFinalGame]);
 
   useEffect(() => {
-    if (isPlayingFinalGame) {
-      setScore(0);
-      navigate("/game");
+    if (isFinalQuestion) {
+      navigate("/finalQuestion");
     }
-  }, [isPlayingFinalGame, navigate]);
-
+  }, [isFinalQuestion]);
   useSocket(CONNECT, () => setIsConnected(true));
   useSocket(DISCONNECT, () => setIsConnected(false));
   useSocket(RETURN_JOIN_TOURNAMENT, (isSuccess: boolean) => {
@@ -125,6 +170,7 @@ export const SocketProvider = ({ children }: ISocketProviderProps) => {
 
   useSocket(RETURN_START_FINAL_GAME, ({ gameId }: { gameId: string }) => {
     setGameId(gameId);
+    setIsGameWinner(undefined);
     setIsPlayingFinalGame(true);
   });
 
@@ -151,9 +197,11 @@ export const SocketProvider = ({ children }: ISocketProviderProps) => {
     setIsGameWinner(true);
   });
   useSocket(RETURN_LOST_GAME, () => {
+    console.log("setting is game winner to false", isGameWinner);
     setIsGameWinner(false);
   });
   useSocket(RETURN_WON_FINAL_GAME, () => {
+    console.log("RETURN_WON_FINAL_GAME");
     setIsTournamentWinner(true);
   });
 
@@ -161,11 +209,37 @@ export const SocketProvider = ({ children }: ISocketProviderProps) => {
     socket.emit(SEND_JOINT_TOURNAMENT, { tournamentId, playerName });
     setTournamentId(tournamentId);
   };
-
   const sendAnswerQuestion = () => {
     console.log(SEND_ANSWER_QUESTION, { tournamentId, gameId });
     socket.emit(SEND_ANSWER_QUESTION, { tournamentId, gameId });
   };
+
+  // FINAL QUESTION
+  useSocket(RETURN_START_FINAL_QUESTION, () => {
+    setIsFinalQuestion(true);
+    setIsBetting(true);
+  });
+  const sendBetAmount = (betAmount: number) => {
+    socket.emit(SEND_BET_AMOUNT, { tournamentId, gameId, betAmount });
+  };
+  useSocket(RETURN_FINAL_QUESTION, () => {
+    setIsBetting(false);
+    setIsAnsweringFinalQuestion(true);
+  });
+  const sendFinalQuestionAnswer = (answer: string) => {
+    socket.emit(SEND_FINAL_QUESTION_ANSWER, { tournamentId, gameId, answer });
+  };
+  useSocket(RETURN_RUN_OUT_OF_TIME, () => {
+    setRunOutOfTime(true);
+  });
+  useSocket(
+    RETURN_IS_FINAL_QUESTION_ANSWER_CORRECT,
+    ({ isCorrect, newScore }: { isCorrect: boolean; newScore: number }) => {
+      setScore(newScore);
+      setIsAnsweringFinalQuestion(false);
+      setIsFinalQuestionAnswerCorrect(isCorrect);
+    }
+  );
 
   return (
     <AppContext.Provider
@@ -178,13 +252,15 @@ export const SocketProvider = ({ children }: ISocketProviderProps) => {
         score,
         isOpenForAnswer,
         sendAnswerQuestion,
+
+        sendBetAmount,
+        sendFinalQuestionAnswer,
+        isBetting,
+        isAnsweringFinalQuestion,
+        isFinalQuestionAnswerCorrect,
+        runOutOfTime,
       }}
     >
-      {/* <div>
-        {messagesLog.map((msg) => (
-          <div key={msg}>{msg}</div>
-        ))}
-      </div> */}
       {children}
     </AppContext.Provider>
   );

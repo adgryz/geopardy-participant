@@ -1,0 +1,48 @@
+.finalQuestionContainer {
+  display: flex;
+  color: white;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 100vh;
+  background-color: #357ecf;
+}
+
+.finalQuestionHeaders {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+.finalQuestionHeader {
+  margin-bottom: 5px;
+}
+.finalQuestionScore {
+  font-size: 24px;
+}
+
+
+.bettingContainer {
+
+}
+.sendFinalQuestionBetButton{
+  margin-top: 20px;
+}
+.betAmountError {
+  color: red;
+}
+
+.answerContainer {
+
+}
+.sendFinalQuestionAnswerButton{
+  margin-top: 20px;
+}
+.finalQuestionConfirmMessage {
+  margin-top: 10px;
+  color: #459e4b;
+}
+.finalQuestionOutOfTimeMessage {
+  margin-top: 10px;
+  color: orange;
+}
