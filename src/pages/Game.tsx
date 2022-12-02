@@ -1,3 +1,5 @@
+import { faGift } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useState, useEffect } from "react";
 
 import { AppContext } from "../services/SocketProvider";
@@ -60,7 +62,10 @@ export const Game = () => {
 
   return (
     <div className="gameContainer">
-      <div className="score">Twój wynik: {score}</div>
+      <div className="score">
+        Twój wynik: {score}{" "}
+        <FontAwesomeIcon className="gameCurrency" icon={faGift} />
+      </div>
       <div
         className={`
         answerButton 
@@ -69,10 +74,12 @@ export const Game = () => {
         ${isFalseStart ? "falseStart" : ""}`}
         onClick={handleAnswer}
       >
-        {isAnswering && <div className="timeToAnswer">{timeToAnswer} s</div>}
-        {isFalseStart && "FALSE START"}
-        {canAnswer && "ODPOWIADAM"}
-        {isWaiting && "CZEKAJ"}
+        <div>
+          {isAnswering && <div className="timeToAnswer">{timeToAnswer} s</div>}
+          {isFalseStart && "FALSE START"}
+          {canAnswer && "ODPOWIEDZ"}
+          {isWaiting && "CZEKAJ"}
+        </div>
       </div>
     </div>
   );

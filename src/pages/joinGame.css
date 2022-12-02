@@ -1,5 +1,23 @@
+/* 
+#eff9ff
+#9e6ec3;
+#357ecf
+#222222
+ */
+
 .joinGameContainer {
-  margin: 30vh 20px;
+  margin: 50px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.joinGameHeader {
+  font-weight: bold;
+  color: #222222;
+  font-size: 30px;
+  margin-bottom: 30px;
 }
 
 .nameInput {
@@ -8,6 +26,19 @@
 
 .codeInput {
   margin-bottom: 20px;
+}
+
+.takePhotoButton {
+  margin: 10px 0 30px;
+  width: 100%;
+}
+
+.avatar {
+  border-radius: 50%;
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  margin: auto;
 }
 
 .joinButton {

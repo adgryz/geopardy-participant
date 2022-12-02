@@ -11,19 +11,23 @@
 }
 
 .answerButton {
-  background-color: #459e4b;
-  color: white;
+  bottom: 50px;
+  left: 50%;
+  transform: translate(-50%, 0);
+  position: fixed;
+  
   font-weight: 900;
   font-size: 36px;
-  width: 90%;
+  width: 300px;
+  height: 300px;
   margin: 0 auto;
-  height: 60vh;
-  border-radius: 20px;
+  border-radius: 50%;
+  background-color: #459e4b;
+  color: #eff9ff;
   
   display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
 }
 
 .isAnswering {
@@ -31,9 +35,16 @@
 }
 
 .blockedButton {
-  background-color: #767676;
+  background-color: #ccc;
+  color: #eff9ff;
 }
 
 .falseStart {
   background-color: #c43a3a;
+}
+
+.gameCurrency {
+ font-size: 36px;
+ color: #303030;
+ margin-left: 10px;
 }

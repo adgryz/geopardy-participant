@@ -1,12 +1,10 @@
 .finalQuestionContainer {
   display: flex;
-  color: white;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
   height: 100vh;
-  background-color: #357ecf;
 }
 
 .finalQuestionHeaders {
@@ -22,19 +20,13 @@
 }
 
 
-.bettingContainer {
-
-}
 .sendFinalQuestionBetButton{
   margin-top: 20px;
 }
 .betAmountError {
-  color: red;
+  color: #c43a3a;
 }
 
-.answerContainer {
-
-}
 .sendFinalQuestionAnswerButton{
   margin-top: 20px;
 }
@@ -46,3 +38,9 @@
   margin-top: 10px;
   color: orange;
 }
+
+.finalCurrency {
+  font-size: 24px;
+  color: #303030;
+  margin-left: 10px;
+ }

@@ -1,11 +1,14 @@
 import { useState, ReactNode, createContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import io from "socket.io-client";
 
 import { getUseSocket } from "./useSocket";
 
-// const socket = io("https://geopargygame.herokuapp.com/");
-const socket = io("http://localhost:3123");
+const isDev = process.env.NODE_ENV === "development";
+const serverAddress = isDev
+  ? "http://localhost:3123"
+  : "https://geopargygame.herokuapp.com/";
+const socket = io(serverAddress);
 
 const useSocket = getUseSocket(socket);
 
@@ -52,7 +55,11 @@ interface AppData {
   isConnected: boolean;
   isTournamentJoined?: boolean;
   isTournamentStarted: boolean;
-  sendJoinTournament: (gameId: string, playerName: string) => void;
+  sendJoinTournament: (
+    gameId: string,
+    playerName: string,
+    base64Photo: string
+  ) => void;
 
   isGameWinner?: boolean;
   isTournamentWinner?: boolean;
@@ -84,7 +91,16 @@ export const AppContext = createContext<AppData>({
 });
 
 export const SocketProvider = ({ children }: ISocketProviderProps) => {
-  const navigate = useNavigate();
+  let history = useHistory();
+
+  useEffect(() => {
+    return () => {
+      if (history.action === "POP") {
+        history.go(1);
+      }
+    };
+  }, [history]);
+
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [isTournamentJoined, setIsTournamentJoined] =
     useState<boolean | undefined>();
@@ -119,16 +135,16 @@ export const SocketProvider = ({ children }: ISocketProviderProps) => {
     );
     if (isGameWinner === true) {
       console.log("navigate gameWinner");
-      navigate("/gameWinner");
+      history.push("/gameWinner");
     }
     if (isGameWinner === false) {
-      navigate("/loser");
+      history.push("/loser");
     }
   }, [isGameWinner]);
 
   useEffect(() => {
     if (isTournamentWinner) {
-      navigate("/tournamentWinner");
+      history.push("/tournamentWinner");
     }
   }, [isTournamentWinner]);
 
@@ -139,20 +155,20 @@ export const SocketProvider = ({ children }: ISocketProviderProps) => {
       setRunOutOfTime(false);
       setIsFinalQuestionAnswerCorrect(undefined);
       setIsBetting(false);
-      navigate("/game");
+      history.push("/game");
     }
   }, [isPlayingFinalGame]);
 
   useEffect(() => {
     if (isPlayingFinalGame) {
       setScore(0);
-      navigate("/game");
+      history.push("/game");
     }
   }, [isPlayingFinalGame]);
 
   useEffect(() => {
     if (isFinalQuestion) {
-      navigate("/finalQuestion");
+      history.push("/finalQuestion");
     }
   }, [isFinalQuestion]);
   useSocket(CONNECT, () => setIsConnected(true));
@@ -165,7 +181,7 @@ export const SocketProvider = ({ children }: ISocketProviderProps) => {
 
   useSocket(RETURN_START_GAME, ({ gameId }: { gameId: string }) => {
     setGameId(gameId);
-    navigate("/game");
+    history.push("/game");
   });
 
   useSocket(RETURN_START_FINAL_GAME, ({ gameId }: { gameId: string }) => {
@@ -205,8 +221,16 @@ export const SocketProvider = ({ children }: ISocketProviderProps) => {
     setIsTournamentWinner(true);
   });
 
-  const sendJoinTournament = (tournamentId: string, playerName: string) => {
-    socket.emit(SEND_JOINT_TOURNAMENT, { tournamentId, playerName });
+  const sendJoinTournament = (
+    tournamentId: string,
+    playerName: string,
+    base64Photo: string
+  ) => {
+    socket.emit(SEND_JOINT_TOURNAMENT, {
+      tournamentId,
+      playerName,
+      base64Photo,
+    });
     setTournamentId(tournamentId);
   };
   const sendAnswerQuestion = () => {

@@ -1,7 +1,6 @@
 import { ChakraProvider } from "@chakra-ui/react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-
-import "./App.css";
+import { BrowserRouter, Route } from "react-router-dom";
+import { useEffect } from "react";
 
 import { SocketProvider } from "./services/SocketProvider";
 import { JoinGame } from "./pages/JoinGame";
@@ -12,20 +11,42 @@ import { Loser } from "./pages/resultPages/Loser";
 import { TournamentWinner } from "./pages/resultPages/TournamentWinner";
 import { FinalQuestion } from "./pages/FinalQuestion";
 
+import theme from "./theme";
+import "./App.css";
+
 function App() {
+  useEffect(() => {
+    window.onbeforeunload = function (e) {
+      e = e || window.event;
+      return "Sure?";
+    };
+  }, []);
+
   return (
     <BrowserRouter>
       <SocketProvider>
-        <ChakraProvider>
-          <Routes>
-            <Route path="/" element={<JoinGame />} />
-            <Route path="/lobby" element={<WaitingForGameStart />} />
-            <Route path="/game" element={<Game />} />
-            <Route path="/finalQuestion" element={<FinalQuestion />} />
-            <Route path="/gameWinner" element={<GameWinner />} />
-            <Route path="/loser" element={<Loser />} />
-            <Route path="/tournamentWinner" element={<TournamentWinner />} />
-          </Routes>
+        <ChakraProvider theme={theme}>
+          <Route exact path="/">
+            <JoinGame />
+          </Route>
+          <Route exact path="/lobby">
+            <WaitingForGameStart />
+          </Route>
+          <Route exact path="/game">
+            <Game />
+          </Route>
+          <Route exact path="/finalQuestion">
+            <FinalQuestion />
+          </Route>
+          <Route path="/gameWinner">
+            <GameWinner />
+          </Route>
+          <Route exact path="/loser">
+            <Loser />
+          </Route>
+          <Route exact path="/tournamentWinner">
+            <TournamentWinner />
+          </Route>
         </ChakraProvider>
       </SocketProvider>
     </BrowserRouter>

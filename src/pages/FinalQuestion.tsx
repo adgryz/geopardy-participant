@@ -4,6 +4,8 @@ import { Input, Button } from "@chakra-ui/react";
 import { AppContext } from "../services/SocketProvider";
 
 import "./finalQuestion.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGift } from "@fortawesome/free-solid-svg-icons";
 
 export const FinalQuestion = () => {
   const {
@@ -30,8 +32,12 @@ export const FinalQuestion = () => {
     const rawValue = event.currentTarget.value;
     const parsedBet = parseInt(rawValue);
     const isValid =
-      !Number.isNaN(parsedBet) && parsedBet >= 0 && parsedBet <= score;
+      score < 0
+        ? parsedBet === 0
+        : !Number.isNaN(parsedBet) && parsedBet >= 0 && parsedBet <= score;
+
     setIsBetAmountValid(isValid);
+
     setBetAmount(rawValue);
     setIsBetAmountTouched(true);
   };
@@ -51,22 +57,36 @@ export const FinalQuestion = () => {
   const getBackgroundColor = () => {
     switch (isFinalQuestionAnswerCorrect) {
       case true:
-        return "#afe4c8";
+        return "#459e4b";
       case false:
-        return "ff9d92";
+        return "#c43a3a";
       default:
-        return "blue";
+        return "#eff9ff";
+    }
+  };
+
+  const getColor = () => {
+    switch (isFinalQuestionAnswerCorrect) {
+      case true:
+        return "#eff9ff";
+      case false:
+        return "#eff9ff";
+      default:
+        return "#222222";
     }
   };
 
   return (
     <div
       className="finalQuestionContainer"
-      style={{ backgroundColor: getBackgroundColor() }}
+      style={{ backgroundColor: getBackgroundColor(), color: getColor() }}
     >
       <div className="finalQuestionHeaders">
         <div className="finalQuestionHeader">Finałowe Pytanie</div>
-        <div className="finalQuestionScore">Twoje punkty: {score}</div>
+        <div className="finalQuestionScore">
+          Twoje punkty: {score}{" "}
+          <FontAwesomeIcon className="gameCurrency" icon={faGift} />
+        </div>
       </div>
 
       {isBetting && (
@@ -74,6 +94,7 @@ export const FinalQuestion = () => {
           <Input
             placeholder="Podaj ile punktów chcesz obstawić"
             className="betAmountInput"
+            colorScheme="primary"
             disabled={isBetAmountSent}
             value={betAmount}
             onChange={handleBetAmountChange}
@@ -82,7 +103,7 @@ export const FinalQuestion = () => {
             <div className="betAmountError">Błędna ilość</div>
           )}
           <Button
-            colorScheme="teal"
+            colorScheme="primary"
             className="sendFinalQuestionBetButton"
             size="lg"
             onClick={handleBetAmountSubmit}
@@ -107,7 +128,7 @@ export const FinalQuestion = () => {
           />
           <Button
             className="sendFinalQuestionAnswerButton"
-            colorScheme="teal"
+            colorScheme="primary"
             size="lg"
             onClick={handleAnswerSubmit}
             isDisabled={!isBetAmountValid || isAnswerSent || runOutOfTime}
