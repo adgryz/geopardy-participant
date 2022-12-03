@@ -1,6 +1,7 @@
 import { useState, ReactNode, createContext, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import io from "socket.io-client";
+import { v4 as uuidv4 } from "uuid";
 
 import { getUseSocket } from "./useSocket";
 
@@ -9,11 +10,13 @@ const serverAddress = isDev
   ? "http://localhost:3123"
   : "https://geopargygame.herokuapp.com/";
 const socket = io(serverAddress);
+const playerId = uuidv4();
 
 const useSocket = getUseSocket(socket);
 
 const CONNECT = "connect";
 const DISCONNECT = "disconnect";
+const RECONNECT_PARTICIPANT = "reconnectParticipant";
 
 //tournament
 const SEND_JOINT_TOURNAMENT = "sendJoinTournament";
@@ -171,8 +174,14 @@ export const SocketProvider = ({ children }: ISocketProviderProps) => {
       history.push("/finalQuestion");
     }
   }, [isFinalQuestion]);
-  useSocket(CONNECT, () => setIsConnected(true));
-  useSocket(DISCONNECT, () => setIsConnected(false));
+  useSocket(CONNECT, () => {
+    setIsConnected(true);
+    socket.emit(RECONNECT_PARTICIPANT, playerId);
+  });
+  useSocket(DISCONNECT, () => {
+    setIsConnected(false);
+    console.log("DISCONNECTED");
+  });
   useSocket(RETURN_JOIN_TOURNAMENT, (isSuccess: boolean) => {
     setIsTournamentJoined(isSuccess);
   });
@@ -230,12 +239,13 @@ export const SocketProvider = ({ children }: ISocketProviderProps) => {
       tournamentId,
       playerName,
       base64Photo,
+      playerId,
     });
     setTournamentId(tournamentId);
   };
   const sendAnswerQuestion = () => {
     console.log(SEND_ANSWER_QUESTION, { tournamentId, gameId });
-    socket.emit(SEND_ANSWER_QUESTION, { tournamentId, gameId });
+    socket.emit(SEND_ANSWER_QUESTION, { tournamentId, gameId, playerId });
   };
 
   // FINAL QUESTION
@@ -244,14 +254,19 @@ export const SocketProvider = ({ children }: ISocketProviderProps) => {
     setIsBetting(true);
   });
   const sendBetAmount = (betAmount: number) => {
-    socket.emit(SEND_BET_AMOUNT, { tournamentId, gameId, betAmount });
+    socket.emit(SEND_BET_AMOUNT, { tournamentId, gameId, betAmount, playerId });
   };
   useSocket(RETURN_FINAL_QUESTION, () => {
     setIsBetting(false);
     setIsAnsweringFinalQuestion(true);
   });
   const sendFinalQuestionAnswer = (answer: string) => {
-    socket.emit(SEND_FINAL_QUESTION_ANSWER, { tournamentId, gameId, answer });
+    socket.emit(SEND_FINAL_QUESTION_ANSWER, {
+      tournamentId,
+      gameId,
+      answer,
+      playerId,
+    });
   };
   useSocket(RETURN_RUN_OUT_OF_TIME, () => {
     setRunOutOfTime(true);
