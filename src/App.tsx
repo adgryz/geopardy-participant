@@ -3,6 +3,8 @@ import { BrowserRouter, Route } from "react-router-dom";
 import { useEffect } from "react";
 
 import { SocketProvider } from "./services/SocketProvider";
+import { useWakeLock } from "./services/useWakeLock";
+import { SoundToggle } from "./services/SoundToggle";
 import { JoinGame } from "./pages/JoinGame";
 import { WaitingForGameStart } from "./pages/WaitingForGameStart";
 import { Game } from "./pages/Game";
@@ -15,6 +17,8 @@ import theme from "./theme";
 import "./App.css";
 
 function App() {
+  useWakeLock();
+
   useEffect(() => {
     window.onbeforeunload = function (e) {
       e = e || window.event;
@@ -47,6 +51,7 @@ function App() {
           <Route exact path="/tournamentWinner">
             <TournamentWinner />
           </Route>
+          <SoundToggle />
         </ChakraProvider>
       </SocketProvider>
     </BrowserRouter>

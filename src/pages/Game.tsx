@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useState, useEffect, useRef } from "react";
 
 import { AppContext } from "../services/SocketProvider";
+import { playSound } from "../services/sound";
 
 import { Scenery } from "../festive/Scenery";
 
@@ -37,6 +38,7 @@ export const Game = () => {
       return;
     }
     if (canAnswer && sendAnswerQuestion()) {
+      playSound("tap");
       setIsPending(true);
       clearTimeout(pendingTimeout.current);
       // Safety net – the server always answers with a new state
@@ -45,6 +47,7 @@ export const Game = () => {
   };
 
   const handleFalseStart = () => {
+    playSound("falseStart");
     setIsFalseStart(true);
     clearTimeout(falseStartTimeout.current);
     falseStartTimeout.current = setTimeout(
@@ -74,6 +77,13 @@ export const Game = () => {
     }, 1000);
     return () => clearInterval(intervalId);
   }, [isAnswering]);
+
+  // The clock gets loud for the last seconds
+  useEffect(() => {
+    if (timeToAnswer !== null && timeToAnswer > 0 && timeToAnswer <= 5) {
+      playSound("tickUrgent");
+    }
+  }, [timeToAnswer]);
 
   useEffect(
     () => () => {

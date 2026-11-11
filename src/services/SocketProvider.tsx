@@ -9,6 +9,8 @@ import { useHistory, useLocation } from "react-router-dom";
 import io from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
 
+import { playSound } from "./sound";
+
 import "./connection.css";
 
 const isDev = process.env.NODE_ENV === "development";
@@ -97,6 +99,67 @@ type PlayerState = {
     answer: string | null;
     isCorrect: boolean | null;
   };
+};
+
+// Sounds follow the changes of the state sent by the server. The first state
+// (join / reload) is silent – nothing has "happened" yet.
+let lastPlayerState: PlayerState | null = null;
+const playStateChangeSounds = (state: PlayerState | null) => {
+  const previous = lastPlayerState;
+  lastPlayerState = state;
+  if (!previous || !state || previous.tournamentId !== state.tournamentId) {
+    return;
+  }
+
+  // Own answer was judged
+  if (previous.buzzer === "answering" && state.buzzer !== "answering") {
+    if (state.score > previous.score) {
+      playSound("correct");
+    } else if (
+      state.score < previous.score ||
+      state.buzzer === "answeredWrongly"
+    ) {
+      playSound("wrong");
+    }
+  }
+
+  if (previous.view !== state.view) {
+    if (state.view === "gameWinner" || state.view === "tournamentWinner") {
+      playSound("fanfare");
+    } else if (state.view === "loser") {
+      playSound("lose");
+    } else if (state.view === "game" || state.view === "finalQuestion") {
+      playSound("start");
+    }
+    return;
+  }
+
+  if (state.view === "game" && previous.buzzer !== state.buzzer) {
+    if (state.buzzer === "answering") {
+      playSound("buzz");
+    } else if (state.buzzer === "open" && previous.buzzer === "closed") {
+      playSound("go");
+    }
+  }
+
+  if (state.view === "finalQuestion") {
+    const before = previous.finalQuestion;
+    const now = state.finalQuestion;
+    if (now.isCorrect !== null && before.isCorrect === null) {
+      playSound(now.isCorrect ? "correct" : "wrong");
+    } else if (before.phase !== now.phase) {
+      if (now.phase === "answering") {
+        playSound("open");
+      } else if (now.phase === "timeUp") {
+        playSound("timeUp");
+      }
+    } else if (
+      (now.hasBet && !before.hasBet) ||
+      (now.hasAnswered && !before.hasAnswered)
+    ) {
+      playSound("sent");
+    }
+  }
 };
 
 const VIEW_PATHS: Record<ParticipantView, string> = {
@@ -209,6 +272,7 @@ export const SocketProvider = ({ children }: ISocketProviderProps) => {
         // Tournament does not exist anymore / player was removed
         saveSession({ playerId: session.playerId });
       }
+      playStateChangeSounds(state);
       setPlayerState(state);
       setStateVersion((version) => version + 1);
       setIsRestoring(false);
@@ -227,6 +291,7 @@ export const SocketProvider = ({ children }: ISocketProviderProps) => {
       const response =
         typeof result === "boolean" ? { success: result } : result;
       if (response.success) {
+        playSound("join");
         setJoinError(undefined);
         if ("tournamentId" in response && response.tournamentId) {
           saveSession({

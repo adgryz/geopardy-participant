@@ -1,0 +1,32 @@
+.soundToggle {
+  position: fixed;
+  z-index: 900;
+  left: max(12px, env(safe-area-inset-left));
+  bottom: max(12px, env(safe-area-inset-bottom));
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(247, 240, 227, 0.25);
+  background: rgba(11, 27, 44, 0.6);
+  color: var(--cream, #f7f0e3);
+  font-size: 16px;
+  opacity: 0.55;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.soundToggle:hover,
+.soundToggle:focus-visible {
+  opacity: 1;
+}
+.soundToggle:active {
+  transform: scale(0.92);
+}
+.soundToggle.isMuted {
+  opacity: 0.85;
+  border-color: var(--cranberry-400, #e05a66);
+  color: var(--cranberry-400, #e05a66);
+}
