@@ -1,0 +1,466 @@
+/* ------------------------------------------------------------------
+   Geopardy — świąteczna warstwa wizualna (wspólna dla hosta i gracza)
+   ------------------------------------------------------------------ */
+:root {
+  --night-900: #07121e;
+  --night-800: #0b1b2c;
+  --night-700: #11283c;
+  --night-600: #1a3a55;
+  --pine-800: #0d2b23;
+  --pine-700: #143d32;
+  --pine-500: #1f5a48;
+  --pine-300: #4caf7d;
+  --cranberry-400: #d0434f;
+  --cranberry-500: #b5262f;
+  --cranberry-700: #821820;
+  --gold-200: #f8e6b0;
+  --gold-400: #e9c46a;
+  --gold-600: #c9973a;
+  --cream: #f7f0e3;
+  --cream-dim: rgba(247, 240, 227, 0.66);
+  --frost: rgba(247, 240, 227, 0.06);
+  --frost-strong: rgba(247, 240, 227, 0.1);
+  --frost-line: rgba(247, 240, 227, 0.16);
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-body: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--night-900);
+  color: var(--cream);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* ---------- układ sceny ---------- */
+.stage {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--cream);
+}
+
+.stageContent {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* ---------- typografia ---------- */
+.display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.05;
+}
+
+.goldText {
+  background: linear-gradient(
+    180deg,
+    var(--gold-200) 0%,
+    var(--gold-400) 48%,
+    var(--gold-600) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--gold-400);
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.28));
+}
+
+.eyebrow {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.82em;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+}
+
+.gift {
+  color: var(--gold-400);
+  margin-left: 0.35em;
+  font-size: 0.8em;
+}
+
+/* ---------- panel ---------- */
+.panel {
+  background: var(--frost);
+  border: 1px solid var(--frost-line);
+  border-radius: 22px;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 24px 50px -24px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+/* ---------- okrągłe przyciski ---------- */
+.roundBtn {
+  position: relative;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 34px;
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.28);
+  box-shadow: 0 14px 26px -12px rgba(0, 0, 0, 0.7),
+    inset 0 2px 0 rgba(255, 255, 255, 0.25);
+  transition: transform 0.2s var(--ease-spring), filter 0.2s;
+}
+.roundBtn:hover {
+  transform: translateY(-3px) scale(1.05);
+  filter: brightness(1.1);
+}
+.roundBtn:active {
+  transform: scale(0.95);
+}
+.roundBtn--ok {
+  background: linear-gradient(160deg, #4fbf8a, #257552);
+}
+.roundBtn--bad {
+  background: linear-gradient(160deg, #e0565b, #99202a);
+}
+.roundBtn--play {
+  width: 124px;
+  height: 124px;
+  font-size: 46px;
+  color: var(--night-800);
+  background: radial-gradient(circle at 35% 28%, #fff4cf, var(--gold-400) 55%, var(--gold-600));
+  border-color: rgba(255, 255, 255, 0.5);
+  animation: popIn 0.5s var(--ease-spring) both;
+}
+.roundBtn--play svg {
+  margin-left: 6px;
+}
+.roundBtn--play::before,
+.roundBtn--play::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 2px solid var(--gold-400);
+  animation: ringPulse 2.4s ease-out infinite;
+  pointer-events: none;
+}
+.roundBtn--play::after {
+  animation-delay: 1.2s;
+}
+
+.pillBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 26px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cream);
+  background: var(--frost-strong);
+  border: 1px solid var(--frost-line);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  transition: background 0.2s, transform 0.2s var(--ease-out), border-color 0.2s;
+}
+.pillBtn:hover {
+  background: rgba(247, 240, 227, 0.18);
+  border-color: rgba(247, 240, 227, 0.4);
+  transform: translateY(-2px);
+}
+
+/* ---------- loader ---------- */
+.loader {
+  display: block;
+  width: 12px;
+  height: 12px;
+  margin: 28px 34px;
+  border-radius: 50%;
+  animation: loaderDots 1.2s linear infinite;
+}
+
+/* ---------- awatar ---------- */
+.avatar {
+  --size: 64px;
+  width: var(--size);
+  height: var(--size);
+  flex: none;
+  border-radius: 50%;
+  object-fit: cover;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(160deg, var(--pine-500), var(--pine-800));
+  color: var(--gold-200);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: calc(var(--size) * 0.44);
+  box-shadow: 0 0 0 3px var(--gold-400), 0 0 0 6px rgba(233, 196, 106, 0.18),
+    0 10px 20px -8px rgba(0, 0, 0, 0.7);
+}
+
+/* ---------- logo ---------- */
+.logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fadeUp 0.9s var(--ease-out) both;
+}
+.logoStar {
+  width: 0.42em;
+  height: 0.42em;
+  color: var(--gold-400);
+  margin-bottom: 0.08em;
+  animation: twinkle 3.2s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px rgba(233, 196, 106, 0.7));
+}
+.logoWord {
+  font-weight: 800;
+  font-style: italic;
+  line-height: 1;
+  padding: 0 0.08em 0.08em;
+}
+.logoTagline {
+  display: flex;
+  align-items: center;
+  gap: 0.9em;
+  margin-top: 0.5em;
+  font-size: 0.17em;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+  white-space: nowrap;
+}
+.logoTagline i {
+  width: 3em;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-400));
+}
+.logoTagline i:last-child {
+  transform: scaleX(-1);
+}
+
+/* ==================================================================
+   Sceneria
+   ================================================================== */
+.scenery {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.scenerySky,
+.sceneryMood {
+  position: absolute;
+  inset: 0;
+}
+.scenerySky {
+  background: radial-gradient(120% 90% at 50% 108%, var(--night-600) 0%, var(--night-800) 52%, var(--night-900) 100%);
+}
+.sceneryMood {
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+.sceneryMood.isOn {
+  opacity: 1;
+}
+.sceneryMood--open {
+  background: radial-gradient(120% 90% at 50% 108%, #2f8a66 0%, #14503f 50%, #0a2a22 100%);
+}
+.sceneryMood--wrong {
+  background: radial-gradient(120% 90% at 50% 108%, #a52a33 0%, #5d141b 52%, #2a090d 100%);
+}
+.sceneryMood--win {
+  background: radial-gradient(90% 70% at 50% 42%, rgba(233, 196, 106, 0.28) 0%, rgba(233, 196, 106, 0) 70%);
+}
+
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  animation: twinkle var(--dur) ease-in-out var(--delay) infinite;
+}
+
+.snow {
+  position: absolute;
+  inset: 0;
+}
+.snowflake {
+  position: absolute;
+  top: -14px;
+  animation: snowFall var(--dur) linear var(--delay) infinite;
+}
+.snowflake i {
+  display: block;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: #fff;
+  opacity: var(--alpha);
+  animation: snowSway var(--sway-dur) ease-in-out var(--delay) infinite alternate;
+}
+.snow--gold .snowflake:nth-child(odd) i {
+  background: var(--gold-400);
+}
+.snow--gold .snowflake:nth-child(3n) i {
+  background: var(--gold-200);
+  border-radius: 2px;
+}
+
+.hills {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 22vh;
+  min-height: 110px;
+}
+.hills svg.hillShape {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.pine {
+  position: absolute;
+  bottom: var(--b);
+  left: var(--x);
+  height: var(--h);
+  width: auto;
+  transform: translateX(-50%);
+}
+
+@media (max-width: 600px) {
+  .hills {
+    height: 13vh;
+    min-height: 90px;
+  }
+  .pine:nth-of-type(3n) {
+    display: none;
+  }
+}
+
+.garland {
+  position: fixed;
+  top: -4px;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  overflow: hidden;
+}
+.garland svg {
+  flex: none;
+  width: 240px;
+  height: 64px;
+}
+.bulbGlow {
+  filter: blur(5px);
+  animation: bulbGlow 3.2s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* ==================================================================
+   Animacje
+   ================================================================== */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+@keyframes snowFall {
+  to { transform: translateY(105vh); }
+}
+@keyframes snowSway {
+  from { transform: translateX(calc(var(--sway) * -1)); }
+  to { transform: translateX(var(--sway)); }
+}
+@keyframes sway {
+  from { transform: rotate(-2.5deg); }
+  to { transform: rotate(2.5deg); }
+}
+@keyframes ringPulse {
+  from { transform: scale(1); opacity: 0.7; }
+  to { transform: scale(1.55); opacity: 0; }
+}
+@keyframes bulbGlow {
+  0%, 100% { opacity: 0.12; transform: scale(0.8); }
+  50% { opacity: 0.7; transform: scale(1.2); }
+}
+@keyframes loaderDots {
+  0%, 100% { background: rgba(233, 196, 106, 0.25); box-shadow: -24px 0 #e9c46a, 24px 0 rgba(233, 196, 106, 0.25); }
+  33% { background: #e9c46a; box-shadow: -24px 0 rgba(233, 196, 106, 0.25), 24px 0 rgba(233, 196, 106, 0.25); }
+  66% { background: rgba(233, 196, 106, 0.25); box-shadow: -24px 0 rgba(233, 196, 106, 0.25), 24px 0 #e9c46a; }
+}
+@keyframes scorePop {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.35); color: #fff; }
+  100% { transform: scale(1); }
+}
+@keyframes shake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(5px); }
+  30%, 50%, 70% { transform: translateX(-9px); }
+  40%, 60% { transform: translateX(9px); }
+}
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.035); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .snow {
+    display: none;
+  }
+}

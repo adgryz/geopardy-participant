@@ -1,7 +1,10 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Input, Button } from "@chakra-ui/react";
 
 import { AppContext } from "../services/SocketProvider";
+
+import { Scenery } from "../festive/Scenery";
+import { Sparkle } from "../festive/Decor";
 
 import "./finalQuestion.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -16,15 +19,30 @@ export const FinalQuestion = () => {
     sendFinalQuestionAnswer,
     isFinalQuestionAnswerCorrect,
     runOutOfTime,
+    hasBet,
+    betAmount: confirmedBetAmount,
+    hasAnswered,
+    submittedAnswer,
   } = useContext(AppContext);
 
-  const [betAmount, setBetAmount] = useState("");
+  // After a reload the server tells what was already sent
+  const [betAmount, setBetAmount] = useState(
+    confirmedBetAmount !== null ? String(confirmedBetAmount) : ""
+  );
   const [isBetAmountTouched, setIsBetAmountTouched] = useState(false);
-  const [isBetAmountSent, setIsBetAmountSent] = useState(false);
+  const [isBetAmountSentLocally, setIsBetAmountSent] = useState(false);
   const [isBetAmountValid, setIsBetAmountValid] =
     useState<boolean | undefined>();
-  const [answer, setAnswer] = useState("");
-  const [isAnswerSent, setIsAnswerSent] = useState(false);
+  const [answer, setAnswer] = useState(submittedAnswer ?? "");
+  const [isAnswerSentLocally, setIsAnswerSent] = useState(false);
+  const isBetAmountSent = hasBet || isBetAmountSentLocally;
+  const isAnswerSent = hasAnswered || isAnswerSentLocally;
+
+  useEffect(() => {
+    if (confirmedBetAmount !== null) {
+      setBetAmount(String(confirmedBetAmount));
+    }
+  }, [confirmedBetAmount]);
 
   const handleBetAmountChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -42,6 +60,7 @@ export const FinalQuestion = () => {
     setIsBetAmountTouched(true);
   };
   const handleBetAmountSubmit = () => {
+    if (!isBetAmountValid || isBetAmountSent) return;
     const parsedBet = parseInt(betAmount);
     sendBetAmount(parsedBet);
     setIsBetAmountSent(true);
@@ -51,43 +70,37 @@ export const FinalQuestion = () => {
     setAnswer(event.currentTarget.value);
   };
   const handleAnswerSubmit = () => {
+    if (isAnswerSent || runOutOfTime) return;
     sendFinalQuestionAnswer(answer);
     setIsAnswerSent(true);
   };
-  const getBackgroundColor = () => {
-    switch (isFinalQuestionAnswerCorrect) {
-      case true:
-        return "#459e4b";
-      case false:
-        return "#c43a3a";
-      default:
-        return "#eff9ff";
-    }
-  };
-
-  const getColor = () => {
-    switch (isFinalQuestionAnswerCorrect) {
-      case true:
-        return "#eff9ff";
-      case false:
-        return "#eff9ff";
-      default:
-        return "#222222";
-    }
-  };
+  const mood =
+    isFinalQuestionAnswerCorrect === true
+      ? "open"
+      : isFinalQuestionAnswerCorrect === false
+      ? "wrong"
+      : "night";
 
   return (
-    <div
-      className="finalQuestionContainer"
-      style={{ backgroundColor: getBackgroundColor(), color: getColor() }}
-    >
+    <div className="stage finalQuestionContainer">
+      <Scenery mood={mood} flakes={22} />
+      <div className="stageContent finalQuestionContent">
       <div className="finalQuestionHeaders">
-        <div className="finalQuestionHeader">Finałowe Pytanie</div>
+        <Sparkle className="finalQuestionStar" />
+        <div className="finalQuestionHeader display goldText">
+          Finałowe Pytanie
+        </div>
         <div className="finalQuestionScore">
-          Twoje punkty: {score}{" "}
-          <FontAwesomeIcon className="gameCurrency" icon={faGift} />
+          Twoje punkty: <b>{score}</b>
+          <FontAwesomeIcon className="gift gameCurrency" icon={faGift} />
         </div>
       </div>
+
+      {isFinalQuestionAnswerCorrect !== undefined && (
+        <div className="finalQuestionVerdict display">
+          {isFinalQuestionAnswerCorrect ? "Dobra odpowiedź!" : "Zła odpowiedź"}
+        </div>
+      )}
 
       {isBetting && (
         <div className="bettingContainer">
@@ -131,7 +144,7 @@ export const FinalQuestion = () => {
             colorScheme="primary"
             size="lg"
             onClick={handleAnswerSubmit}
-            isDisabled={!isBetAmountValid || isAnswerSent || runOutOfTime}
+            isDisabled={isAnswerSent || runOutOfTime}
           >
             Zatwierdź
           </Button>
@@ -145,6 +158,7 @@ export const FinalQuestion = () => {
           )}
         </div>
       )}
+      </div>
     </div>
   );
 };

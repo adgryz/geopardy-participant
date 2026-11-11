@@ -1,0 +1,45 @@
+.resultContainer {
+  padding: 24px;
+}
+
+.resultStar {
+  width: 44px;
+  height: 44px;
+  color: var(--gold-400);
+  margin-bottom: 10px;
+  filter: drop-shadow(0 0 14px rgba(233, 196, 106, 0.8));
+  animation: twinkle 2.6s ease-in-out infinite;
+}
+
+.resultTitle {
+  font-size: 54px;
+  font-weight: 800;
+  font-style: italic;
+  padding: 0 0.1em 0.1em;
+  text-wrap: balance;
+  animation: popIn 0.7s var(--ease-spring) both;
+}
+.loserText {
+  font-size: 38px;
+  color: var(--cream);
+}
+
+.resultText {
+  font-size: 20px;
+  color: var(--cream-dim);
+  margin-top: 6px;
+  animation: fadeUp 0.7s var(--ease-out) 0.2s both;
+}
+
+.resultGif {
+  margin-top: 28px;
+  max-width: min(100%, 340px);
+  border-radius: 18px;
+  border: 5px solid var(--cream);
+  box-shadow: 0 26px 50px -18px rgba(0, 0, 0, 0.85);
+  rotate: -1.5deg;
+  animation: fadeUp 0.8s var(--ease-out) 0.35s both;
+}
+.loserGif {
+  filter: saturate(0.8);
+}

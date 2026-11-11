@@ -1,46 +1,78 @@
 .finalQuestionContainer {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  height: 100vh;
+  padding: 24px;
+}
+
+.finalQuestionContent {
+  width: 100%;
+  max-width: 380px;
 }
 
 .finalQuestionHeaders {
-  font-size: 32px;
-  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin-bottom: 30px;
 }
+.finalQuestionStar {
+  width: 30px;
+  height: 30px;
+  color: var(--gold-400);
+  margin-bottom: 10px;
+  filter: drop-shadow(0 0 12px rgba(233, 196, 106, 0.7));
+  animation: twinkle 3s ease-in-out infinite;
+}
 .finalQuestionHeader {
-  margin-bottom: 5px;
+  font-size: 40px;
+  font-style: italic;
+  font-weight: 800;
+  padding: 0 0.1em 0.1em;
+  margin-bottom: 8px;
 }
 .finalQuestionScore {
-  font-size: 24px;
+  font-size: 19px;
+  color: var(--cream-dim);
+}
+.finalQuestionScore b {
+  font-family: var(--font-display);
+  font-size: 1.3em;
+  color: var(--cream);
+}
+.finalQuestionScore .gameCurrency {
+  font-size: 0.9em;
 }
 
+.finalQuestionVerdict {
+  font-size: 34px;
+  margin-bottom: 26px;
+  animation: popIn 0.6s var(--ease-spring) both;
+}
 
-.sendFinalQuestionBetButton{
-  margin-top: 20px;
+.bettingContainer,
+.answerContainer {
+  width: 100%;
+  animation: fadeUp 0.6s var(--ease-out) both;
+}
+.bettingContainer input,
+.answerContainer input {
+  text-align: center;
+}
+
+.sendFinalQuestionBetButton,
+.sendFinalQuestionAnswerButton {
+  margin-top: 18px;
+  width: 100%;
 }
 .betAmountError {
-  color: #c43a3a;
-}
-
-.sendFinalQuestionAnswerButton{
-  margin-top: 20px;
+  margin-top: 8px;
+  color: #f6a4a8;
 }
 .finalQuestionConfirmMessage {
-  margin-top: 10px;
-  color: #459e4b;
+  margin-top: 14px;
+  font-weight: 600;
+  color: #8fe0b4;
 }
 .finalQuestionOutOfTimeMessage {
-  margin-top: 10px;
-  color: orange;
+  margin-top: 14px;
+  font-weight: 600;
+  color: var(--gold-400);
 }
-
-.finalCurrency {
-  font-size: 24px;
-  color: #303030;
-  margin-left: 10px;
- }

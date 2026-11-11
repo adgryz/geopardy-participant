@@ -1,46 +1,81 @@
-/* 
-#eff9ff
-#9e6ec3;
-#357ecf
-#222222
- */
-
 .joinGameContainer {
-  margin: 50px 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-start;
+  padding: 28px 24px 40px;
+}
+
+.joinGameContent {
+  width: 100%;
+  max-width: 380px;
 }
 
 .joinGameHeader {
-  font-weight: bold;
-  color: #222222;
-  font-size: 30px;
-  margin-bottom: 30px;
+  font-size: 13px;
+  margin: 14px 0 6px;
 }
 
-.nameInput {
-  margin-bottom: 20px;
+/* zdjęcie jako bombka */
+.photoFrame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 18px 0 16px;
+  animation: popIn 0.7s var(--ease-spring) 0.15s both;
 }
-
-.codeInput {
-  margin-bottom: 20px;
+.baubleCap {
+  width: 30px;
+  height: 16px;
+  border-radius: 5px 5px 2px 2px;
+  background: linear-gradient(90deg, var(--gold-600), var(--gold-200) 45%, var(--gold-600));
+  margin-bottom: 4px;
+}
+.photoCircle {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--pine-500), var(--pine-800));
+  box-shadow: 0 0 0 4px var(--gold-400), 0 0 0 9px rgba(233, 196, 106, 0.18),
+    0 24px 40px -14px rgba(0, 0, 0, 0.8);
+}
+.photoCircle::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.35), transparent 38%);
+  pointer-events: none;
+}
+.photoCircle.hasPhoto {
+  animation: flash 0.5s ease-out;
+}
+.webcamFeed,
+.joinAvatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .takePhotoButton {
-  margin: 10px 0 30px;
-  width: 100%;
+  margin-bottom: 26px;
 }
 
-.avatar {
-  border-radius: 50%;
-  width: 200px;
-  height: 200px;
-  object-fit: cover;
-  margin: auto;
+.nameInput {
+  margin-bottom: 16px;
+  text-align: center;
 }
 
 .joinButton {
   width: 100%;
+  animation: fadeUp 0.5s var(--ease-out) both;
+}
+
+.joinGameError {
+  margin-top: 16px;
+  color: #f6a4a8;
+}
+
+@keyframes flash {
+  from { filter: brightness(2.4); }
+  to { filter: none; }
 }
